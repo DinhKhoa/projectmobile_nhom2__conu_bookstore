@@ -4,6 +4,7 @@ import '../widgets/widgets.dart';
 import 'home_screen.dart';
 import 'report_screen.dart';
 import 'placeholder_screen.dart';
+import 'category_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -32,10 +33,7 @@ class _MainScreenState extends State<MainScreen> {
           icon: Icons.category_outlined,
         );
       case 'categories':
-        return const PlaceholderScreen(
-          title: AppConstants.navCategories,
-          icon: Icons.layers_outlined,
-        );
+        return const CategoryScreen();   
       case 'customers':
         return const PlaceholderScreen(
           title: AppConstants.navCustomers,
