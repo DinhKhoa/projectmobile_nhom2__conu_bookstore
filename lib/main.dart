@@ -1,25 +1,7 @@
 import 'package:flutter/material.dart';
-import 'core/core.dart';
-import 'screens/screens.dart';
+import 'app/app.dart';
 
 void main() {
+  // Add initialization logic here if needed (e.g. Firebase, Local Storage)
   runApp(const ConuBookstoreApp());
-}
-
-class ConuBookstoreApp extends StatelessWidget {
-  const ConuBookstoreApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppConstants.appTitle,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialRoute: '/login',
-      routes: {
-        '/login': (_) => const LoginScreen(),
-        '/main': (_) => const MainScreen(),
-      },
-    );
-  }
 }
