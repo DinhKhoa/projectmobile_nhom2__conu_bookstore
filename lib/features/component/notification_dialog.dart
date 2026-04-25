@@ -38,6 +38,25 @@ class NotificationDialog extends StatelessWidget {
     );
   }
 
+  static void showAddCategorySuccess(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        Future.delayed(const Duration(seconds: 2), () {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+        });
+        return const NotificationDialog(
+          title: 'Thêm Mới Loại Hàng\n\nThành Công!',
+          message: '',
+          icon: Icons.check_circle_outline,
+          iconColor: AppColors.primary,
+        );
+      },
+    );
+  }
+
   static void showConfirm(BuildContext context, String title, String message, VoidCallback onConfirm) {
     showDialog(
       context: context,

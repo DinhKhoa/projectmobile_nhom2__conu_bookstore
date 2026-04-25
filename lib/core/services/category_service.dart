@@ -18,11 +18,4 @@ class CategoryService {
     return await ApiService.post('/categories', category.toJson());
   }
 
-  static Future<Map<String, dynamic>> updateCategory(String id, Category category) async {
-    return await ApiService.put('/categories/$id', category.toJson());
-  }
-
-  static Future<Map<String, dynamic>> deleteCategory(String id) async {
-    return await ApiService.delete('/categories/$id');
-  }
 }

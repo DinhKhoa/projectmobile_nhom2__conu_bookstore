@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:projectmobile_nhom2__conu_bookstore/core/core.dart';
 import 'package:projectmobile_nhom2__conu_bookstore/core/models/category.dart';
-import 'package:projectmobile_nhom2__conu_bookstore/core/services/category_service.dart';
 import 'package:projectmobile_nhom2__conu_bookstore/features/component/notification_dialog.dart';
+import 'package:projectmobile_nhom2__conu_bookstore/features/category/presentation/add_category_screen.dart';
+import 'package:projectmobile_nhom2__conu_bookstore/features/category/presentation/category_detail_screen.dart';
+import 'package:projectmobile_nhom2__conu_bookstore/core/services/category_service.dart';
 import '../../report/presentation/widgets/report_data_table.dart';
 
 class CategoryScreen extends StatefulWidget {
+  // Màn hình danh sách loại hàng
+  // - Hiển thị các loại đang `active` (server trả về active theo mặc định)
+  // - Có nút điều hướng sang màn hình thêm loại hàng riêng
   const CategoryScreen({super.key});
 
   @override
@@ -19,6 +24,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   int _currentPage = 1;
   static const int _pageSize = 10;
   bool _isLoading = false;
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -26,6 +32,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     _fetchCategories();
   }
 
+  // Gọi API để lấy danh sách loại hàng (mặc định chỉ active)
   Future<void> _fetchCategories() async {
     setState(() => _isLoading = true);
     try {
@@ -51,6 +58,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     super.dispose();
   }
 
+  // Lọc local theo từ khoá search trên mã hoặc tên
   void _filterCategories() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -66,229 +74,57 @@ class _CategoryScreenState extends State<CategoryScreen> {
     });
   }
 
-  void _showAddCategoryDialog() {
-    final TextEditingController nameController = TextEditingController();
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: 400,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  color: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'THÊM MỚI LOẠI HÀNG',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.close, color: Colors.white, size: 24),
-                      )
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Text(
-                        'Thông Tin Loại Hàng:',
-                        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 18),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      Text('Tên LH:', style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          hintText: 'VD: Đồ chơi',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25),
-                            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: AppColors.primary),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                              ),
-                              child: const Text('Hủy'),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                  if (nameController.text.trim().isNotEmpty) {
-                                    final newCat = Category(id: '', maLoai: 'L${_allCategories.length + 1}', tenLoai: nameController.text.trim(), trangThai: 'active');
-                                    final result = await CategoryService.createCategory(newCat);
-                                  if (result['success'] == true) {
-                                    _fetchCategories();
-                                    if (context.mounted) {
-                                      Navigator.pop(context);
-                                      NotificationDialog.showSuccess(context, 'Thêm Mới Loại Hàng Thành Công!');
-                                    }
-                                  }
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                              ),
-                              child: const Text('Lưu', style: TextStyle(color: Colors.white)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  void _onSearch() {
+    _filterCategories();
+    setState(() {
+      _isSearching = _searchController.text.trim().isNotEmpty;
+    });
   }
 
-  void _showEditCategoryDialog(Category category) {
-    final TextEditingController nameController = TextEditingController(text: category.tenLoai);
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: 400,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  color: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'CẬP NHẬT LOẠI HÀNG',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.close, color: Colors.white, size: 24),
-                      )
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text('Mã LH: ${category.maLoai}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 20),
-                      Text('Tên LH:', style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                NotificationDialog.showConfirm(context, 'Xác nhận xóa', 'Bạn có chắc chắn muốn xóa loại hàng này?', () async {
-                                  final res = await CategoryService.deleteCategory(category.id);
-                                  if (res['success'] == true) {
-                                    _fetchCategories();
-                                    if (context.mounted) {
-                                      Navigator.pop(context);
-                                      NotificationDialog.showSuccess(context, 'Xóa thành công!');
-                                    }
-                                  }
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red[700]),
-                              child: const Text('Xóa', style: TextStyle(color: Colors.white)),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                if (nameController.text.trim().isNotEmpty) {
-                                  final updated = Category(id: category.id, maLoai: category.maLoai, tenLoai: nameController.text.trim(), trangThai: category.trangThai);
-                                  final result = await CategoryService.updateCategory(category.id, updated);
-                                  if (result['success'] == true) {
-                                    _fetchCategories();
-                                    if (context.mounted) {
-                                      Navigator.pop(context);
-                                      NotificationDialog.showSuccess(context, 'Cập nhật thành công!');
-                                    }
-                                  }
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                              child: const Text('Lưu', style: TextStyle(color: Colors.white)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  void _onClearSearch() {
+    _searchController.clear();
+    setState(() {
+      _displayedCategories = List.from(_allCategories);
+      _currentPage = 1;
+      _isSearching = false;
+    });
+  }
+
+  // Mở màn hình thêm loại hàng chuyên biệt và chờ kết quả
+  Future<void> _openAddCategoryScreen() async {
+    final created = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddCategoryScreen(initialCategories: _allCategories),
+      ),
+    );
+
+    if (created == true) {
+      // Nếu có tạo mới thành công -> tải lại danh sách và show popup thành công
+      await _fetchCategories();
+      if (mounted) {
+        NotificationDialog.showAddCategorySuccess(context);
+      }
+    }
+  }
+
+  // Mở chi tiết loại hàng (màn hình danh sách sản phẩm thuộc loại đó)
+  void _openCategoryDetail(Category category) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CategoryDetailScreen(
+          category: category,
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final tableWidth = screenWidth * 0.9;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
@@ -316,61 +152,113 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: _showAddCategoryDialog,
-                          icon: const Icon(Icons.add_circle_outline, color: Colors.white, size: 20),
-                          label: const Text('Thêm loại hàng', style: TextStyle(color: Colors.white)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        SizedBox(
+                          height: 36,
+                          child: ElevatedButton.icon(
+                            onPressed: _openAddCategoryScreen,
+                            icon: const Icon(Icons.add_circle_outline, color: Colors.white, size: 18),
+                            label: const Text('Thêm loại hàng', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                              padding: const EdgeInsets.symmetric(horizontal: 14),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Container(
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                                ),
-                                child: TextField(
-                                  controller: _searchController,
-                                  onChanged: (_) => _filterCategories(),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Tìm kiếm',
-                                    hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
-                                    prefixIcon: Icon(Icons.search, size: 20, color: AppColors.textSecondary),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          child: Container(
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: AppColors.primary),
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              textAlignVertical: TextAlignVertical.center,
+                              style: const TextStyle(fontSize: 13, height: 1.0),
+                              textInputAction: TextInputAction.search,
+                              onSubmitted: (_) => _onSearch(),
+                              decoration: InputDecoration(
+                                hintText: 'Tìm kiếm',
+                                hintStyle: const TextStyle(fontSize: 13, height: 1.0, color: AppColors.textHint),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: Container(
+                                    height: 22,
+                                    width: 22,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.search, size: 12, color: Colors.white),
                                   ),
                                 ),
+                                suffixIconConstraints: const BoxConstraints(minHeight: 22, minWidth: 22),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_isSearching) ...[
+                            SizedBox(
+                              height: 32,
+                              child: ElevatedButton(
+                                onPressed: _onClearSearch,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                                ),
+                                child: const Text('Hủy', style: TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          SizedBox(
+                            height: 32,
+                            child: ElevatedButton(
+                              onPressed: _onSearch,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                              ),
+                              child: const Text('Tìm kiếm', style: TextStyle(color: Colors.white)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
-                    ReportDataTable(
-                      columns: const ['Mã LH', 'Tên LH'],
-                      rows: _displayedCategories
-                          .skip((_currentPage - 1) * _pageSize)
-                          .take(_pageSize)
-                          .map((cat) => [cat.maLoai, cat.tenLoai])
-                          .toList(),
-                      currentPage: _currentPage,
-                      totalPages: (_displayedCategories.length / _pageSize).ceil(),
-                      onPageChanged: (page) => setState(() => _currentPage = page),
-                      onRowTap: (index) {
-                        final cat = _displayedCategories[(_currentPage - 1) * _pageSize + index];
-                        _showEditCategoryDialog(cat);
-                      },
+                    Center(
+                      child: ReportDataTable(
+                        columns: const ['Mã LH', 'Tên LH'],
+                        rows: _displayedCategories
+                            .skip((_currentPage - 1) * _pageSize)
+                            .take(_pageSize)
+                            .map((cat) => [cat.maLoai, cat.tenLoai])
+                            .toList(),
+                        currentPage: _currentPage,
+                        totalPages: (_displayedCategories.length / _pageSize).ceil(),
+                        tableWidth: tableWidth,
+                        onPageChanged: (page) => setState(() => _currentPage = page),
+                        onRowTap: (index) {
+                          final cat = _displayedCategories[(_currentPage - 1) * _pageSize + index];
+                          _openCategoryDetail(cat);
+                        },
+                      ),
                     ),
                     const SizedBox(height: 40),
                   ],

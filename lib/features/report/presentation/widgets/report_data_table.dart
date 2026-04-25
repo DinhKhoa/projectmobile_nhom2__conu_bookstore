@@ -85,6 +85,7 @@ class ReportDataTable extends StatelessWidget {
                                   color: AppColors.textPrimary,
                                 ),
                                 textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           );
