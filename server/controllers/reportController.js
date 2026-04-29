@@ -10,48 +10,91 @@ const parseDate = (str, isEnd = false) => {
   return date;
 };
 
+// @desc    Lấy báo cáo doanh thu và tăng trưởng
+// @route   GET /api/report/revenue?start=...&end=...
+// @access  Private
 const getRevenueReport = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-    const start = parseDate(startDate);
-    const end = parseDate(endDate, true);
-
+    const { start: startDateStr, end: endDateStr } = req.query;
+    const start = parseDate(startDateStr);
+    const end = parseDate(endDateStr, true);
     const duration = end.getTime() - start.getTime();
     const prevStart = new Date(start.getTime() - duration - 1);
     const prevEnd = new Date(start.getTime() - 1);
-
     const getSummary = async (s, e) => {
-      const data = await Order.aggregate([
-        { $match: { NgayBan: { $gte: s, $lte: e }, TrangThai: 'Hoàn thành' } },
+      const data = await OrderDetail.aggregate([
         {
-          $group: {
-            _id: { $dateToString: { format: '%Y-%m-%d', date: '$NgayBan' } },
-            orderCount: { $sum: 1 },
-            tongThanhTien: { $sum: '$TongThanhTien' },
-            chietKhau: { $sum: '$ChietKhau' },
+          $lookup: {
+            from: 'orders',
+            localField: 'MaHoaDonBan',
+            foreignField: '_id',
+            as: 'order',
           },
         },
+        { $unwind: '$order' },
+        { $match: { 'order.NgayBan': { $gte: s, $lte: e } } },
+        {
+          $lookup: {
+            from: 'products',
+            localField: 'MaHH',
+            foreignField: '_id',
+            as: 'product',
+          },
+        },
+        { $unwind: '$product' },
+        {
+          $addFields: {
+            itemProfit: {
+              $multiply: [
+                '$SoLuongBan',
+                '$product.GiaBan',
+                { $divide: ['$product.LoiNhuan', 100] }
+              ]
+            }
+          }
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$order.NgayBan' } },
+            orderIds: { $addToSet: '$MaHoaDonBan' },
+            totalAmount: { $sum: '$ThanhTien' },
+            totalProfit: { $sum: '$itemProfit' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: '$_id',
+            orderCount: { $size: '$orderIds' },
+            totalAmount: 1,
+            netRevenue: '$totalAmount',
+            totalRevenue: '$totalAmount',
+            grossProfit: '$totalProfit',
+          }
+        },
+        { $sort: { date: 1 } }
       ]);
       const totals = data.reduce((acc, d) => ({
         orders: acc.orders + d.orderCount,
-        revenue: acc.revenue + d.tongThanhTien,
-      }), { orders: 0, revenue: 0 });
+        revenue: acc.revenue + d.totalAmount,
+        profit: acc.profit + d.grossProfit,
+      }), { orders: 0, revenue: 0, profit: 0 });
       return { daily: data, summary: totals };
     };
-
     const current = await getSummary(start, end);
     const previous = await getSummary(prevStart, prevEnd);
-
     const calcPercent = (curr, prev) => (prev <= 0 ? (curr > 0 ? 100 : 0) : parseFloat(((curr - prev) / prev * 100).toFixed(2)));
-
     res.json({
       success: true,
       data: {
         daily: current.daily,
         summary: {
-          orders: { value: current.summary.orders, percent: calcPercent(current.summary.orders, previous.summary.orders) },
-          netRevenue: { value: current.summary.revenue, percent: calcPercent(current.summary.revenue, previous.summary.revenue) },
-          grossProfit: { value: current.summary.revenue * 0.4, percent: 0 } // Giả định 40% lợi nhuận nếu không tính chi tiết
+          totalOrders: current.summary.orders,
+          totalOrdersChange: calcPercent(current.summary.orders, previous.summary.orders),
+          netRevenue: current.summary.revenue,
+          netRevenueChange: calcPercent(current.summary.revenue, previous.summary.revenue),
+          grossProfit: current.summary.profit,
+          grossProfitChange: calcPercent(current.summary.profit, previous.summary.profit)
         }
       }
     });
@@ -59,14 +102,15 @@ const getRevenueReport = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
+// @desc    Lấy báo cáo sản phẩm bán chạy/bán chậm
+// @route   GET /api/report/products?start=...&end=...&slowSelling=...
+// @access  Private
 const getProductReport = async (req, res) => {
   try {
-    const { startDate, endDate, type = 'best' } = req.query;
-    const start = parseDate(startDate);
-    const end = parseDate(endDate, true);
-    const sortDir = type === 'best' ? -1 : 1;
-
+    const { start: startDateStr, end: endDateStr, slowSelling } = req.query;
+    const start = parseDate(startDateStr);
+    const end = parseDate(endDateStr, true);
+    const sortDir = slowSelling === 'true' ? 1 : -1;
     const data = await OrderDetail.aggregate([
       {
         $lookup: {
@@ -77,7 +121,7 @@ const getProductReport = async (req, res) => {
         },
       },
       { $unwind: '$order' },
-      { $match: { 'order.NgayBan': { $gte: start, $lte: end }, 'order.TrangThai': 'Hoàn thành' } },
+      { $match: { 'order.NgayBan': { $gte: start, $lte: end } } },
       {
         $group: {
           _id: '$MaHH',
@@ -95,22 +139,41 @@ const getProductReport = async (req, res) => {
       },
       { $unwind: '$product' },
       {
+        $lookup: {
+          from: 'categories',
+          localField: 'product.MaLoai',
+          foreignField: '_id',
+          as: 'categoryInfo',
+        },
+      },
+      {
         $project: {
-          TenHH: '$product.TenHH',
-          MaHH: '$product.MaHH',
+          _id: 0,
+          productName: '$product.TenHH',
+          category: { $ifNull: [{ $arrayElemAt: ['$categoryInfo.TenLoai', 0] }, '---'] },
           soldQuantity: 1,
           totalRevenue: 1,
-          LoiNhuan: { $multiply: ['$soldQuantity', '$product.LoiNhuan'] }
+          netRevenue: '$totalRevenue',
+          grossProfit: { 
+            $multiply: [
+              '$soldQuantity', 
+              '$product.GiaBan', 
+              { $divide: ['$product.LoiNhuan', 100] }
+            ] 
+          }
         },
+      },
+      {
+        $match: slowSelling === 'true' 
+          ? { soldQuantity: { $lte: 20 } } 
+          : { soldQuantity: { $gt: 20 } } 
       },
       { $sort: { soldQuantity: sortDir } },
       { $limit: 25 },
     ]);
-
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 module.exports = { getRevenueReport, getProductReport };

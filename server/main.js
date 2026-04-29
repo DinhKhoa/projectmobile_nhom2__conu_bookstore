@@ -3,24 +3,23 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const seedDatabase = require('./utils/seed');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// ─── Middleware ─────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// ─── Routes ─────────────────────────────────────────────────
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('Body:', JSON.stringify(req.body, null, 2));
+  next();
+});
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/customers', require('./routes/customerRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/report', require('./routes/reportRoutes'));
-
-// ─── API Documentation ─────────────────────────────────────────
 app.get('/api', (req, res) => {
   res.json({
     success: true,
@@ -84,7 +83,6 @@ app.get('/api', (req, res) => {
     },
   });
 });
-
 app.get('/', (req, res) => {
   res.json({
     success: true,
@@ -93,19 +91,18 @@ app.get('/', (req, res) => {
     version: '1.0.0',
   });
 });
-
-// ─── 404 Handler ─────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} không tồn tại` });
 });
-
-// ─── Global Error Handler ─────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
-  res.status(500).json({ success: false, message: 'Lỗi server', error: err.message });
+  console.error('CRITICAL ERROR:', err);
+  res.status(500).json({ 
+    success: false, 
+    message: 'Lỗi server nội bộ', 
+    error: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });
-
-// ─── Start Server ─────────────────────────────────────────────
 const start = async () => {
   await connectDB();
   await seedDatabase(); 
@@ -114,5 +111,4 @@ const start = async () => {
     console.log(`📖 API docs tại: http://localhost:${PORT}/`);
   });
 };
-
 start();

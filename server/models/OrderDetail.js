@@ -1,5 +1,5 @@
+// Model d?i di?n cho chi ti?t hóa don bán hàng
 const mongoose = require('mongoose');
-
 const OrderDetailSchema = new mongoose.Schema(
   {
     MaCTHoaDonBan: {
@@ -28,5 +28,4 @@ const OrderDetailSchema = new mongoose.Schema(
   },
   { timestamps: true, collection: 'order_details' }
 );
-
 module.exports = mongoose.model('OrderDetail', OrderDetailSchema);

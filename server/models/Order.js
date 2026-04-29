@@ -1,5 +1,5 @@
+// Model d?i di?n cho h�a don b�n h�ng
 const mongoose = require('mongoose');
-
 const OrderSchema = new mongoose.Schema(
   {
     MaHoaDonBan: {
@@ -19,11 +19,6 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    TrangThai: {
-      type: String,
-      enum: ['Hoàn thành', 'Đã hủy', 'Đang xử lý'],
-      default: 'Hoàn thành',
-    },
     PhuongThucThanhToan: {
       type: String,
       default: 'Tiền mặt',
@@ -32,12 +27,14 @@ const OrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Customer',
     },
-    note: {
+    customerName: {
       type: String,
-      default: '',
+      default: 'Khách lẻ',
+    },
+    customerCode: {
+      type: String,
     },
   },
   { timestamps: true, collection: 'orders' }
 );
-
 module.exports = mongoose.model('Order', OrderSchema);

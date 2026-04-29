@@ -1,5 +1,5 @@
+// Model d?i di?n cho s?n ph?m (Hàng hóa)
 const mongoose = require('mongoose');
-
 const ProductSchema = new mongoose.Schema(
   {
     MaHH: {
@@ -47,5 +47,4 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true, collection: 'products' }
 );
-
 module.exports = mongoose.model('Product', ProductSchema);

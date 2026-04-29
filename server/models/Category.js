@@ -1,5 +1,5 @@
+// Model đại diện cho danh mục sản phẩm (Loại hàng)
 const mongoose = require('mongoose');
-
 const CategorySchema = new mongoose.Schema(
   {
     MaLoai: {
@@ -11,12 +11,7 @@ const CategorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    TrangThai: {
-      type: String,
-      default: 'active',
-    },
   },
   { timestamps: true, collection: 'categories' }
 );
-
 module.exports = mongoose.model('Category', CategorySchema);

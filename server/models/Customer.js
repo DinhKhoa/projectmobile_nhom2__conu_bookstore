@@ -1,5 +1,5 @@
+// Model d?i di?n cho khách hàng
 const mongoose = require('mongoose');
-
 const CustomerSchema = new mongoose.Schema(
   {
     MaKH: {
@@ -22,5 +22,4 @@ const CustomerSchema = new mongoose.Schema(
   },
   { timestamps: true, collection: 'customers' }
 );
-
 module.exports = mongoose.model('Customer', CustomerSchema);
