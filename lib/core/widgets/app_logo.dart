@@ -17,36 +17,10 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.menu_book_rounded,
-          size: iconSize,
-          color: color,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'CONU',
-          style: TextStyle(
-            fontSize: titleFontSize,
-            fontWeight: FontWeight.bold,
-            color: color,
-            letterSpacing: 4,
-            height: 1.0,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'B O O K S T O R E',
-          style: TextStyle(
-            fontSize: subtitleFontSize,
-            fontWeight: FontWeight.w400,
-            color: color,
-            letterSpacing: 5,
-          ),
-        ),
-      ],
+    return Image.asset(
+      'assets/images/co_nu_xanh.png',
+      height: iconSize * 1.5,
+      fit: BoxFit.contain,
     );
   }
 }

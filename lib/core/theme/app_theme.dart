@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'app_colors.dart';
 
 class AppTheme {
@@ -23,7 +24,10 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: const BorderSide(color: AppColors.inputBorder),
@@ -34,7 +38,10 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: AppColors.inputFocusBorder, width: 2),
+          borderSide: const BorderSide(
+            color: AppColors.inputFocusBorder,
+            width: 2,
+          ),
         ),
         hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
       ),
@@ -42,9 +49,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.buttonPrimary,
           foregroundColor: AppColors.buttonText,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),

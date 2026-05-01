@@ -26,15 +26,16 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const Icon(Icons.menu, color: AppColors.iconWhite),
         onPressed: onMenuPressed ?? () => Scaffold.of(context).openDrawer(),
       ),
-      title: Text(
-        title,
-        style: AppTextStyles.appBarTitle,
-      ),
+      title: Text(title, style: AppTextStyles.appBarTitle),
       centerTitle: true,
       actions: [
         ...?additionalActions,
         IconButton(
-          icon: const Icon(Icons.account_circle_outlined, color: AppColors.iconWhite, size: 28),
+          icon: const Icon(
+            Icons.account_circle_outlined,
+            color: AppColors.iconWhite,
+            size: 28,
+          ),
           onPressed: onProfilePressed ?? () {},
         ),
       ],

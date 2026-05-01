@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projectmobile_nhom2__conu_bookstore/core/core.dart';
 import 'package:projectmobile_nhom2__conu_bookstore/features/features.dart';
-import 'package:projectmobile_nhom2__conu_bookstore/shared/widgets/placeholder_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,13 +17,13 @@ class _MainScreenState extends State<MainScreen> {
       case 'home':
         return const HomeScreen();
       case 'sales':
-        return const SalesListScreen();
+        return const SalesScreen();
       case 'report':
         return const ReportScreen();
       case 'products':
         return const ProductsScreen();
       case 'categories':
-        return const CategoryScreen();   
+        return const CategoryScreen();
       case 'customers':
         return const CustomerScreen();
       default:
@@ -37,7 +36,6 @@ class _MainScreenState extends State<MainScreen> {
       _handleLogout();
       return;
     }
-
     setState(() {
       _currentRoute = routeId;
     });

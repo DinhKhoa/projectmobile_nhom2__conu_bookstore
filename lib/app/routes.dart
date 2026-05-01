@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../features/features.dart';
 import '../navigation/main_screen.dart';
 
@@ -9,7 +10,7 @@ class AppRoutes {
   static const String main = '/main';
 
   static Map<String, WidgetBuilder> get routes => {
-        login: (_) => const LoginScreen(),
-        main: (_) => const MainScreen(),
-      };
+    login: (_) => const LoginScreen(),
+    main: (_) => const MainScreen(),
+  };
 }

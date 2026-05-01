@@ -1,70 +1,67 @@
-import 'package:intl/intl.dart';
+import 'package:projectmobile_nhom2__conu_bookstore/features/report/domain/entities/report_entity.dart';
 
-class RevenueSummary {
-  final double netRevenue;
-  final double grossProfit;
-  final int totalOrders;
-  final double netRevenueChange;
-  final double grossProfitChange;
-  final double totalOrdersChange;
-
-  RevenueSummary({
-    required this.netRevenue,
-    required this.grossProfit,
-    required this.totalOrders,
-    required this.netRevenueChange,
-    required this.grossProfitChange,
-    required this.totalOrdersChange,
+class RevenueSummaryModel extends RevenueSummaryEntity {
+  const RevenueSummaryModel({
+    required super.netRevenue,
+    required super.grossProfit,
+    required super.totalOrders,
+    required super.netRevenueChange,
+    required super.grossProfitChange,
+    required super.totalOrdersChange,
   });
+
+  factory RevenueSummaryModel.fromJson(Map<String, dynamic> json) {
+    return RevenueSummaryModel(
+      netRevenue: (json['netRevenue'] ?? 0).toDouble(),
+      grossProfit: (json['grossProfit'] ?? 0).toDouble(),
+      totalOrders: json['totalOrders'] ?? 0,
+      netRevenueChange: (json['netRevenueChange'] ?? 0).toDouble(),
+      grossProfitChange: (json['grossProfitChange'] ?? 0).toDouble(),
+      totalOrdersChange: (json['totalOrdersChange'] ?? 0).toDouble(),
+    );
+  }
 }
 
-class DailyRevenue {
-  final DateTime date;
-  final int orderCount;
-  final double totalAmount;   // subTotal (tiền hàng)
-  final double discount;       // chiết khấu
-  final double returnAmount;   // tiền hàng trả lại
-  final double tax;            // tiền thuế
-  final double netRevenue;     // doanh thu thuần
-  final double totalRevenue;   // tổng doanh thu
-  final double grossProfit;    // lợi nhuận gộp
-
-  DailyRevenue({
-    required this.date,
-    required this.orderCount,
-    required this.totalAmount,
-    required this.discount,
-    this.returnAmount = 0,
-    this.tax = 0,
-    this.netRevenue = 0,
-    this.totalRevenue = 0,
-    this.grossProfit = 0,
+class DailyRevenueModel extends DailyRevenueEntity {
+  const DailyRevenueModel({
+    required super.date,
+    required super.orderCount,
+    required super.totalAmount,
+    super.netRevenue,
+    super.totalRevenue,
+    super.grossProfit,
   });
 
-  String get formattedDate => DateFormat('dd/MM').format(date);
-  String get fullFormattedDate => DateFormat('dd/MM/yyyy').format(date);
+  factory DailyRevenueModel.fromJson(Map<String, dynamic> json) {
+    return DailyRevenueModel(
+      date: DateTime.parse(json['date']),
+      orderCount: json['orderCount'] ?? 0,
+      totalAmount: (json['totalAmount'] ?? 0).toDouble(),
+      netRevenue: (json['netRevenue'] ?? 0).toDouble(),
+      totalRevenue: (json['totalRevenue'] ?? 0).toDouble(),
+      grossProfit: (json['grossProfit'] ?? 0).toDouble(),
+    );
+  }
 }
 
-class ProductReportItem {
-  final String productName;
-  final String category;
-  final int soldQuantity;
-  final double totalRevenue;   // tiền hàng
-  final double discount;        // chiết khấu
-  final double returnAmount;    // tiền hàng trả lại
-  final double netRevenue;      // doanh thu thuần
-  final double totalRevenueWithTax; // tổng doanh thu
-  final double grossProfit;     // lợi nhuận gộp
-
-  ProductReportItem({
-    required this.productName,
-    required this.category,
-    required this.soldQuantity,
-    required this.totalRevenue,
-    this.discount = 0,
-    this.returnAmount = 0,
-    this.netRevenue = 0,
-    this.totalRevenueWithTax = 0,
-    this.grossProfit = 0,
+class ProductReportModel extends ProductReportEntity {
+  const ProductReportModel({
+    required super.productName,
+    required super.category,
+    required super.soldQuantity,
+    required super.totalRevenue,
+    super.netRevenue,
+    super.grossProfit,
   });
+
+  factory ProductReportModel.fromJson(Map<String, dynamic> json) {
+    return ProductReportModel(
+      productName: json['productName'] ?? '',
+      category: json['category'] ?? '',
+      soldQuantity: json['soldQuantity'] ?? 0,
+      totalRevenue: (json['totalRevenue'] ?? 0).toDouble(),
+      netRevenue: (json['netRevenue'] ?? 0).toDouble(),
+      grossProfit: (json['grossProfit'] ?? 0).toDouble(),
+    );
+  }
 }
