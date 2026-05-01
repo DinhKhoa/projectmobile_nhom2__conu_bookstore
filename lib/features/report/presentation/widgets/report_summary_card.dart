@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/core.dart';
 
 class ReportSummaryCard extends StatelessWidget {
@@ -18,7 +19,6 @@ class ReportSummaryCard extends StatelessWidget {
     final bool isPositive = percentage >= 0;
     final Color color = isPositive ? Colors.green : Colors.red;
     final IconData icon = isPositive ? Icons.north_east : Icons.south_east;
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -65,11 +65,7 @@ class ReportSummaryCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    icon,
-                    size: 14,
-                    color: color,
-                  ),
+                  Icon(icon, size: 14, color: color),
                   const SizedBox(width: 2),
                   Text(
                     '${percentage.abs().toStringAsFixed(1)}%',

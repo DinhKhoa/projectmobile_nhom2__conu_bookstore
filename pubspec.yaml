@@ -1,5 +1,5 @@
 name: projectmobile_nhom2__conu_bookstore
-description: "CONU Bookstore - Ứng dụng quản lý sách"
+description: "CONU Bookstore - Ứng dụng quản lý bán sách"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -12,9 +12,18 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
-  fl_chart: ^0.70.2
-  http: ^1.2.2
+  fl_chart: ^1.2.0
   shared_preferences: ^2.3.2
+  # State Management
+  flutter_bloc: ^9.0.0
+  equatable: ^2.0.7
+  # Dependency Injection
+  get_it: ^9.2.1
+  # Functional Programming & API
+  dartz: ^0.10.1
+  dio: ^5.7.0
+  # UI & Design
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:
@@ -26,3 +35,8 @@ flutter:
 
   assets:
     - assets/images/
+
+dependency_overrides:
+  path_provider: 2.1.3
+  path_provider_android: 2.2.2
+  path_provider_foundation: 2.4.0

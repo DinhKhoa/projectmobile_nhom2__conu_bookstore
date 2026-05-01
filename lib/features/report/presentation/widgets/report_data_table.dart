@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import '../../../../core/core.dart';
 
 class ReportDataTable extends StatelessWidget {
@@ -9,7 +9,7 @@ class ReportDataTable extends StatelessWidget {
   final int currentPage;
   final int totalPages;
   final Function(int)? onPageChanged;
-  final String? trendType; // 'up', 'down', or null
+  final String? trendType;
   final Function(int)? onRowTap;
   final double? tableWidth;
 
@@ -29,7 +29,21 @@ class ReportDataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final horizontalController = ScrollController();
-    
+    if (rows.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 60),
+        alignment: Alignment.center,
+        child: const Text(
+          'Chưa có dữ liệu',
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    }
     return Column(
       children: [
         Scrollbar(
@@ -39,7 +53,7 @@ class ReportDataTable extends StatelessWidget {
             controller: horizontalController,
             scrollDirection: Axis.horizontal,
             child: Container(
-              width: tableWidth ?? (columns.length <= 2 ? 600 : 1150), 
+              width: tableWidth ?? (columns.length <= 2 ? 600 : 1150),
               decoration: BoxDecoration(
                 color: AppColors.backgroundWhite,
                 borderRadius: const BorderRadius.only(
@@ -50,9 +64,11 @@ class ReportDataTable extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Header
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 0,
+                    ),
                     decoration: const BoxDecoration(
                       color: Color(0xFFE0E0E0),
                       borderRadius: BorderRadius.only(
@@ -66,14 +82,19 @@ class ReportDataTable extends StatelessWidget {
                           final i = entry.key;
                           final col = entry.value;
                           return Expanded(
-                            flex: i == 0 ? 3 : 2, 
+                            flex: i == 0 ? 3 : 2,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border(
-                                  right: i == columns.length - 1 
-                                    ? BorderSide.none 
-                                    : const BorderSide(color: AppColors.divider),
+                                  right: i == columns.length - 1
+                                      ? BorderSide.none
+                                      : const BorderSide(
+                                          color: AppColors.divider,
+                                        ),
                                 ),
                               ),
                               alignment: Alignment.center,
@@ -82,7 +103,7 @@ class ReportDataTable extends StatelessWidget {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
-                                  color: AppColors.textPrimary,
+                                  color: Colors.black,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -92,54 +113,51 @@ class ReportDataTable extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Rows
-                  if (rows.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(32),
-                      alignment: Alignment.center,
-                      child: const Text('Không có dữ liệu', style: TextStyle(color: AppColors.textSecondary)),
-                    )
-                  else
-                    ...List.generate(rows.length, (index) {
-                      final isEven = index % 2 == 0;
-                      return GestureDetector(
-                        onTap: () => onRowTap?.call(index),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: alternateRowColor && !isEven 
-                              ? const Color(0xFFF3F8FB) // Very light blue
+                  ...List.generate(rows.length, (index) {
+                    final isEven = index % 2 == 0;
+                    return GestureDetector(
+                      onTap: () => onRowTap?.call(index),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: alternateRowColor && !isEven
+                              ? const Color(0xFFF3F8FB)
                               : AppColors.backgroundWhite,
-                            border: Border(
-                              bottom: index == rows.length - 1 
-                                ? BorderSide.none 
+                          border: Border(
+                            bottom: index == rows.length - 1
+                                ? BorderSide.none
                                 : const BorderSide(color: AppColors.divider),
-                            ),
                           ),
-                          child: IntrinsicHeight(
-                            child: Row(
-                              children: rows[index].asMap().entries.map((entry) {
-                                final colIndex = entry.key;
-                                final text = entry.value;
-                                final isLastColumn = colIndex == columns.length - 1;
-                                
-                                return Expanded(
-                                  flex: colIndex == 0 ? 3 : 2,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        right: isLastColumn 
-                                          ? BorderSide.none 
-                                          : const BorderSide(color: AppColors.divider),
-                                      ),
+                        ),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            children: rows[index].asMap().entries.map((entry) {
+                              final colIndex = entry.key;
+                              final text = entry.value;
+                              final isLastColumn =
+                                  colIndex == columns.length - 1;
+                              return Expanded(
+                                flex: colIndex == 0 ? 3 : 2,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      right: isLastColumn
+                                          ? BorderSide.none
+                                          : const BorderSide(
+                                              color: AppColors.divider,
+                                            ),
                                     ),
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: entry.value is Widget
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Flexible(
+                                        child: entry.value is Widget
                                             ? (entry.value as Widget)
                                             : Text(
                                                 entry.value.toString(),
@@ -150,31 +168,35 @@ class ReportDataTable extends StatelessWidget {
                                                 textAlign: TextAlign.center,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
+                                      ),
+                                      if (isLastColumn &&
+                                          trendType != null) ...[
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          trendType == 'up'
+                                              ? Icons.north_east
+                                              : Icons.south_east,
+                                          color: trendType == 'up'
+                                              ? Colors.green
+                                              : Colors.red,
+                                          size: 14,
                                         ),
-                                        if (isLastColumn && trendType != null) ...[
-                                          const SizedBox(width: 4),
-                                          Icon(
-                                            trendType == 'up' ? Icons.arrow_upward : Icons.arrow_downward,
-                                            color: trendType == 'up' ? Colors.green : Colors.red,
-                                            size: 14,
-                                          ),
-                                        ],
                                       ],
-                                    ),
+                                    ],
                                   ),
-                                );
-                              }).toList(),
-                            ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
-                      );
-                    }),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
           ),
         ),
-        // Pagination Bar
         if (totalPages > 1)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -191,19 +213,26 @@ class ReportDataTable extends StatelessWidget {
               children: [
                 Text(
                   'Trang $currentPage / $totalPages',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 Row(
                   children: [
                     IconButton(
-                      onPressed: currentPage > 1 ? () => onPageChanged?.call(currentPage - 1) : null,
+                      onPressed: currentPage > 1
+                          ? () => onPageChanged?.call(currentPage - 1)
+                          : null,
                       icon: const Icon(Icons.chevron_left),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
                     const SizedBox(width: 16),
                     IconButton(
-                      onPressed: currentPage < totalPages ? () => onPageChanged?.call(currentPage + 1) : null,
+                      onPressed: currentPage < totalPages
+                          ? () => onPageChanged?.call(currentPage + 1)
+                          : null,
                       icon: const Icon(Icons.chevron_right),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),

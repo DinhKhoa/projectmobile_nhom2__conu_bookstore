@@ -24,21 +24,43 @@ class AppDrawer extends StatelessWidget {
   });
 
   static const List<_DrawerMenuItem> _menuItems = [
-    _DrawerMenuItem(icon: Icons.home_outlined, title: AppConstants.navHome, routeId: 'home'),
-    _DrawerMenuItem(icon: Icons.point_of_sale, title: AppConstants.navSales, routeId: 'sales'),
-    _DrawerMenuItem(icon: Icons.bar_chart, title: AppConstants.navReport, routeId: 'report'),
-    _DrawerMenuItem(icon: Icons.category_outlined, title: AppConstants.navProducts, routeId: 'products'),
-    _DrawerMenuItem(icon: Icons.layers_outlined, title: AppConstants.navCategories, routeId: 'categories'),
-    _DrawerMenuItem(icon: Icons.people_outline, title: AppConstants.navCustomers, routeId: 'customers'),
+    _DrawerMenuItem(
+      icon: Icons.home_outlined,
+      title: AppConstants.navHome,
+      routeId: 'home',
+    ),
+    _DrawerMenuItem(
+      icon: Icons.point_of_sale,
+      title: AppConstants.navSales,
+      routeId: 'sales',
+    ),
+    _DrawerMenuItem(
+      icon: Icons.bar_chart,
+      title: AppConstants.navReport,
+      routeId: 'report',
+    ),
+    _DrawerMenuItem(
+      icon: Icons.category_outlined,
+      title: AppConstants.navProducts,
+      routeId: 'products',
+    ),
+    _DrawerMenuItem(
+      icon: Icons.layers_outlined,
+      title: AppConstants.navCategories,
+      routeId: 'categories',
+    ),
+    _DrawerMenuItem(
+      icon: Icons.people_outline,
+      title: AppConstants.navCustomers,
+      routeId: 'customers',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: AppColors.drawerBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
         children: [
           _buildHeader(),
@@ -64,35 +86,46 @@ class AppDrawer extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32),
-      decoration: const BoxDecoration(
-        color: AppColors.drawerHeader,
-      ),
+      decoration: const BoxDecoration(color: AppColors.drawerHeader),
       child: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white54, width: 2),
-              ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                size: 40,
-                color: AppColors.iconWhite,
+            const Icon(
+              Icons.menu_book_rounded,
+              size: 50,
+              color: AppColors.iconWhite,
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'CONU',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 35,
+                fontFamily: 'Times New Roman',
               ),
             ),
-            const SizedBox(height: 12),
-            const Text('CONU', style: AppTextStyles.drawerHeaderTitle),
-            const SizedBox(height: 2),
-            const Text('B O O K S T O R E', style: AppTextStyles.drawerHeaderSubtitle),
+            const Text(
+              'B O O K S T O R E',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+                letterSpacing: 2,
+                fontFamily: 'Times New Roman',
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, _DrawerMenuItem item, bool isSelected) {
+  Widget _buildMenuItem(
+    BuildContext context,
+    _DrawerMenuItem item,
+    bool isSelected,
+  ) {
     return Container(
       color: isSelected ? AppColors.drawerSelectedItem : Colors.transparent,
       child: ListTile(
@@ -110,7 +143,10 @@ class AppDrawer extends StatelessWidget {
   Widget _buildLogoutItem(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.logout, color: AppColors.iconWhite, size: 22),
-      title: const Text(AppConstants.navLogout, style: AppTextStyles.drawerItem),
+      title: const Text(
+        AppConstants.navLogout,
+        style: AppTextStyles.drawerItem,
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       onTap: () {
         Navigator.pop(context);

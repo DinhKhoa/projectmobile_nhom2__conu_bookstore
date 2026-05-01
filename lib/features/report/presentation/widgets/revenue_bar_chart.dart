@@ -1,11 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../../../core/core.dart';
-import '../../data/report_models.dart';
+import '../../domain/entities/report_entity.dart';
 
 class RevenueBarChart extends StatelessWidget {
-  final List<DailyRevenue> data;
+  final List<DailyRevenueEntity> data;
   final String title;
   final VoidCallback onViewDetails;
 
@@ -19,12 +20,10 @@ class RevenueBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) return const SizedBox.shrink();
-
-    final maxAmount = data.isNotEmpty 
+    final maxAmount = data.isNotEmpty
         ? data.map((e) => e.netRevenue).reduce((a, b) => a > b ? a : b)
         : 1000.0;
     final interval = (maxAmount / 4).ceilToDouble();
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -67,7 +66,10 @@ class RevenueBarChart extends StatelessWidget {
                   minimumSize: const Size(100, 32),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
-                child: const Text('Xem chi tiết', style: TextStyle(fontSize: 12)),
+                child: const Text(
+                  'Xem chi tiết',
+                  style: TextStyle(fontSize: 12),
+                ),
               ),
             ],
           ),
@@ -97,9 +99,10 @@ class RevenueBarChart extends StatelessWidget {
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index < 0 || index >= data.length) return const SizedBox.shrink();
-                        // Only show every 2-3 titles to avoid crowding if too many days
-                        if (data.length > 7 && index % (data.length / 4).ceil() != 0) {
+                        if (index < 0 || index >= data.length)
+                          return const SizedBox.shrink();
+                        if (data.length > 7 &&
+                            index % (data.length / 4).ceil() != 0) {
                           return const SizedBox.shrink();
                         }
                         return SideTitleWidget(
@@ -122,27 +125,37 @@ class RevenueBarChart extends StatelessWidget {
                       reservedSize: 40,
                       interval: interval > 0 ? interval : 1,
                       getTitlesWidget: (value, meta) {
-                        if (value == 0) return const Text('0đ', style: TextStyle(fontSize: 10));
+                        if (value == 0)
+                          return const Text(
+                            '0đ',
+                            style: TextStyle(fontSize: 10),
+                          );
                         if (value >= 1000000) {
-                          return Text('${(value / 1000000).toStringAsFixed(1)}tr', 
-                            style: const TextStyle(fontSize: 10));
+                          return Text(
+                            '${(value / 1000000).toStringAsFixed(1)}tr',
+                            style: const TextStyle(fontSize: 10),
+                          );
                         }
-                        return Text('${(value / 1000).toStringAsFixed(0)}k',
-                          style: const TextStyle(fontSize: 10));
+                        return Text(
+                          '${(value / 1000).toStringAsFixed(0)}k',
+                          style: const TextStyle(fontSize: 10),
+                        );
                       },
                     ),
                   ),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                 ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: interval > 0 ? interval : 1,
-                  getDrawingHorizontalLine: (value) => const FlLine(
-                    color: AppColors.divider,
-                    strokeWidth: 1,
-                  ),
+                  getDrawingHorizontalLine: (value) =>
+                      const FlLine(color: AppColors.divider, strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(data.length, (index) {
